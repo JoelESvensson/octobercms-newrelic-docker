@@ -9,10 +9,11 @@ sed -i "s/newrelic.appname = \"PHP Application\"/newrelic.appname = \"${NR_APP_N
 newrelic-php5-$NR_AGENT_VERSION-linux-musl/newrelic-install install
 
 mkdir -p /srv/storage/main/logs /srv/storage/main/framework/cache /srv/storage/main/framework/sessions /srv/storage/main/framework/views
-# ln -sf /dev/stderr /srv/storage/main/logs/laravel.log
 
 chown -R www-data:www-data /srv/storage/main
 
+
+# Ensure that the database is active
 php -- "$DB_CONNECTION" "$DB_HOST" "$DB_PORT" "$DB_DATABASE" "$DB_USERNAME" "$DB_PASSWORD" <<'EOPHP'
 <?php
 $stderr = fopen('php://stderr', 'w');
@@ -33,8 +34,10 @@ for ($maxTries = 10;;) {
 }
 EOPHP
 
+# Symlink everything that needs to be public
 php /srv/app/artisan october:mirror /srv/app/public
 
+# Initialize the database
 php /srv/app/artisan october:up
 
 exec "php-fpm"
