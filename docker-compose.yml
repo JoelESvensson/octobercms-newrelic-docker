@@ -1,0 +1,39 @@
+version: '2'
+services:
+    logspout:
+        image: gliderlabs/logspout:latest
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        command: "${LOGSPOUT_ENDPOINT}"
+    db:
+        image: mariadb:10.1
+        depends_on:
+            - logspout
+        restart: always
+        env_file: .env
+    alliansfritt:
+        image: joelesvensson/octobercms-newrelic:latest
+        depends_on:
+            - db
+            - logspout
+        links:
+            - db:mariadb
+        ports:
+            - "${EXT_PORT}:80"
+        restart: always
+        env_file: .env
+        volumes:
+            - "${VOLUME_PATH_PREFIX}/srv/storage/main/app:/srv/storage/main/app"
+            - "${VOLUME_PATH_PREFIX}/srv/storage/main/logs:/srv/storage/main/logs"
+    nrsysmond:
+        image: newrelic/nrsysmond:latest
+        privileged: true
+        pid: host
+        network_mode: host
+        env_file: .env
+        restart: always
+        volumes:
+            - /sys:/sys
+            - /dev:/dev
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /var/log:/var/log:rw
