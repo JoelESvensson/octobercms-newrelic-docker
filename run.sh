@@ -2,10 +2,11 @@
 set -e
 
 echo "Enabling APM metrics for ${NR_APP_NAME}"
-# newrelic-install install
 
 # Update the application name
 sed -i "s/newrelic.appname = \"PHP Application\"/newrelic.appname = \"${NR_APP_NAME}\"/" /usr/local/etc/php/conf.d/newrelic.ini
+
+newrelic-php5-$NR_AGENT_VERSION-linux-musl/newrelic-install install
 
 mkdir -p /srv/storage/main/logs /srv/storage/main/framework/cache /srv/storage/main/framework/sessions /srv/storage/main/framework/views
 # ln -sf /dev/stderr /srv/storage/main/logs/laravel.log
