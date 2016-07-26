@@ -116,6 +116,12 @@ return [
         // 'Illuminate\Html\HtmlServiceProvider', // Example
 
         'System\ServiceProvider',
+
+        /**
+         * Remove this if you don't need proper reverse proxy support
+         * (e.g. support for load balancers)
+         */
+        'Fideloper\Proxy\TrustedProxyServiceProvider',
     ]),
 
     /*
